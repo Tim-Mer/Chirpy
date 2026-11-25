@@ -19,6 +19,7 @@ coverage.xml
 *.coverprofile
 profile.cov
 out
+Chirpy/*
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
