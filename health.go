@@ -14,7 +14,7 @@ func handlerHealthz(writer http.ResponseWriter, req *http.Request) {
 
 func validateChirp(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Body  string `json:"body"`
+		Body string `json:"body"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
@@ -55,5 +55,9 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(dat)
+	w.Write(removeProfanity(dat))
+}
+
+func removeProfanity(tmp []byte) []byte {
+	return tmp
 }
