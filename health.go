@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"slices"
+	"strings"
 )
 
 func handlerHealthz(writer http.ResponseWriter, req *http.Request) {
@@ -26,10 +28,14 @@ func validateChirp(w http.ResponseWriter, r *http.Request) {
 			respondWithError(w, http.StatusBadRequest, "Chirp is too long")
 		} else {
 			type returnVals struct {
-				Valid bool `json:"valid"`
+				Valid        bool   `json:"valid"`
+				Body         string `json:"body"`
+				Cleaned_body string `json:"cleaned_body"`
 			}
 			retVal := returnVals{
-				Valid: true,
+				Valid:        true,
+				Body:         params.Body,
+				Cleaned_body: removeProfanity(params.Body),
 			}
 			respondWithJSON(w, http.StatusOK, retVal)
 		}
@@ -55,9 +61,16 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(removeProfanity(dat))
+	w.Write(dat)
 }
 
-func removeProfanity(tmp []byte) []byte {
-	return tmp
+func removeProfanity(s string) string {
+	profanity := []string{"kerfuffle", "sharbert", "fornax"}
+	spl := strings.Split(s, " ")
+	for i, t := range spl {
+		if slices.Contains(profanity, strings.ToLower(t)) {
+			spl[i] = "****"
+		}
+	}
+	return strings.Join(spl, " ")
 }
